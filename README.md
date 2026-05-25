@@ -8,7 +8,38 @@ Template generic pentru site-uri cu sistem de rezervări, galerie de produse/ser
 
 ## Pornire rapidă
 
-### 1. Clonează și instalează dependențele
+### Setup automat (recomandat)
+
+Un singur script face tot: creează proiectul Supabase, aplică schema, preia cheile API, configurează `.env.local` și face deploy pe Vercel.
+
+**Prima dată (o singură dată pe mașină):**
+```bash
+npm install -g supabase vercel
+supabase login   # deschide browserul pentru autentificare
+vercel login
+```
+
+**Pentru fiecare proiect nou:**
+```bash
+git clone https://github.com/alindashboard/site-template.git nume-proiect
+cd nume-proiect
+npm install
+vercel link      # leagă directorul de proiectul Vercel
+./scripts/setup.sh nume-proiect
+```
+
+> **Windows:** rulează în **Git Bash**, nu în PowerShell.
+
+Scriptul afișează la final parola DB — salveaz-o în 1Password.
+
+---
+
+### Setup manual (alternativă)
+
+<details>
+<summary>Extinde dacă preferi pași manuali</summary>
+
+#### 1. Clonează și instalează
 
 ```bash
 git clone https://github.com/alindashboard/site-template.git my-project
@@ -16,34 +47,36 @@ cd my-project
 npm install
 ```
 
-### 2. Configurează variabilele de mediu
+#### 2. Creează proiect Supabase
+
+1. [supabase.com](https://supabase.com) → **New project**
+2. **SQL Editor** → copiază și rulează `supabase/schema.sql`
+3. **Storage** → **New bucket** → `items` (Public)
+4. **Authentication** → **Users** → **Add user** (adminul tău)
+
+#### 3. Configurează variabilele de mediu
 
 ```bash
 cp .env.local.example .env.local
+# Completează cu valorile din Supabase → Settings → API
 ```
 
-Completează `.env.local` cu valorile din Supabase Dashboard și Resend.
+#### 4. Setează env vars în Vercel
 
-### 3. Crează baza de date în Supabase
+```bash
+vercel env add NEXT_PUBLIC_SUPABASE_URL production
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
+vercel env add SUPABASE_SERVICE_ROLE_KEY production
+vercel --prod
+```
 
-1. Intră în [supabase.com](https://supabase.com) și creează un proiect nou
-2. Mergi la **SQL Editor**
-3. Copiază conținutul din `supabase/schema.sql` și rulează-l
+</details>
 
-### 4. Crează bucket de stocare în Supabase
+---
 
-1. Mergi la **Storage** → **New bucket**
-2. Denumește-l `items`
-3. Bifează **Public bucket**
+### Personalizează site-ul
 
-### 5. Configurează contul de admin
-
-1. Mergi la **Authentication** → **Users** → **Add user**
-2. Adaugă email + parolă pentru adminul tău
-
-### 6. Personalizează site-ul
-
-Editează `lib/config.ts`:
+Editează `lib/config.ts` cu datele clientului:
 
 ```ts
 export const SITE_CONFIG = {
@@ -62,7 +95,7 @@ export const SITE_CONFIG = {
 }
 ```
 
-### 7. Pornește local
+### Dev local
 
 ```bash
 npm run dev
